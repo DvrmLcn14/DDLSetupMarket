@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
-import { SimGame, CarSetup, UserAccount, SupportedF1GameId, VerificationStatus } from './types';
+import { SimGame, CarSetup, UserAccount, SupportedF1GameId, VerificationStatus, FloatingBannerConfig } from './types';
 import { SIM_GAMES, INITIAL_SETUPS } from './data/mockData';
+import { DEFAULT_FLOATING_BANNER_CONFIG } from './data/bannerConfig';
 import { SetupMarketplace } from './components/SetupMarketplace';
 import { AuthBarrier } from './components/AuthBarrier';
 import { AuthModal } from './components/AuthModal';
 import { DesktopHeader } from './components/DesktopHeader';
 import { AdminVerificationPanel } from './components/AdminVerificationPanel';
+import { FloatingBanner } from './components/FloatingBanner';
+import { BannerConfigModal } from './components/BannerConfigModal';
 
 export default function App() {
   // Active game selected in the marketplace (defaults to F1 25)
@@ -73,6 +76,29 @@ export default function App() {
   const [authModalMode, setAuthModalMode] = useState<'login' | 'register'>('login');
   const [isSubmitModalTriggered, setIsSubmitModalTriggered] = useState<boolean>(false);
   const [isAdminPanelOpen, setIsAdminPanelOpen] = useState<boolean>(false);
+  const [isBannerConfigOpen, setIsBannerConfigOpen] = useState<boolean>(false);
+
+  // Floating Banner / Ad Box state persisted in localStorage
+  const [bannerConfig, setBannerConfig] = useState<FloatingBannerConfig>(() => {
+    try {
+      const stored = localStorage.getItem('ddl_floating_banner_config');
+      if (stored) {
+        return JSON.parse(stored);
+      }
+    } catch (e) {
+      console.warn('Could not read saved banner config', e);
+    }
+    return DEFAULT_FLOATING_BANNER_CONFIG;
+  });
+
+  const handleSaveBannerConfig = (updated: FloatingBannerConfig) => {
+    setBannerConfig(updated);
+    try {
+      localStorage.setItem('ddl_floating_banner_config', JSON.stringify(updated));
+    } catch (e) {
+      console.warn('Could not persist banner config', e);
+    }
+  };
 
   // Setups state (seeded with initial community setups, merged with user-submitted ones and user ratings)
   const [setups, setSetups] = useState<CarSetup[]>(() => {
@@ -262,8 +288,22 @@ export default function App() {
     setSetups((prev) => {
       const updated = prev.map((s) => {
         if (s.id === setupId) {
-          const newCount = s.ratingCount + 1;
-          const newAvg = Number(((s.averageRating * s.ratingCount + rating) / newCount).toFixed(1));
+          const hadPreviousRating = Boolean(s.userRating);
+          let newCount: number;
+          let newAvg: number;
+
+          if (hadPreviousRating && s.userRating) {
+            // User is changing their existing rating
+            const totalSum = s.averageRating * s.ratingCount - s.userRating + rating;
+            newCount = s.ratingCount;
+            newAvg = Number((totalSum / Math.max(1, newCount)).toFixed(1));
+          } else {
+            // New review submitted by user
+            newCount = (s.ratingCount || 0) + 1;
+            const currentSum = (s.averageRating || 0) * (s.ratingCount || 0);
+            newAvg = Number(((currentSum + rating) / newCount).toFixed(1));
+          }
+
           return {
             ...s,
             averageRating: newAvg,
@@ -363,7 +403,25 @@ export default function App() {
         onUpdateStatus={handleUpdateSetupStatus}
         onUpdateSetup={handleUpdateSetup}
         onDeleteSetup={handleDeleteSetup}
+        onOpenBannerConfig={() => setIsBannerConfigOpen(true)}
       />
+
+      {/* Floating Bottom-Right Ad / Discord Community Box */}
+      <FloatingBanner
+        config={bannerConfig}
+        isAdmin={currentUser?.badge?.includes('Admin') || currentUser?.username?.toLowerCase().includes('admin') || currentUser?.username === 'DDLSetup'}
+        onOpenSettings={() => setIsBannerConfigOpen(true)}
+      />
+
+      {/* Admin Banner Configuration Modal */}
+      {isBannerConfigOpen && (
+        <BannerConfigModal
+          isOpen={isBannerConfigOpen}
+          config={bannerConfig}
+          onClose={() => setIsBannerConfigOpen(false)}
+          onSaveConfig={handleSaveBannerConfig}
+        />
+      )}
     </div>
   );
 }

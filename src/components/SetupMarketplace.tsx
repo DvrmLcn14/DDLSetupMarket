@@ -2209,8 +2209,14 @@ Exported from DDLSetupMarket (ddlsetupmarket.com)`;
               </div>
               <div className="text-[11px] text-slate-400 flex items-center gap-2 mt-1">
                 <span>Current Score:</span>
-                <span className="text-amber-400 font-bold">{ratingModalSetup.averageRating.toFixed(1)} / 5</span>
-                <span className="text-slate-500">({ratingModalSetup.ratingCount} reviews)</span>
+                {ratingModalSetup.ratingCount > 0 ? (
+                  <>
+                    <span className="text-amber-400 font-bold">{ratingModalSetup.averageRating.toFixed(1)} / 5</span>
+                    <span className="text-slate-500">({ratingModalSetup.ratingCount} {ratingModalSetup.ratingCount === 1 ? 'review' : 'reviews'})</span>
+                  </>
+                ) : (
+                  <span className="text-slate-400 italic">No reviews yet (Be the first to rate!)</span>
+                )}
               </div>
             </div>
 

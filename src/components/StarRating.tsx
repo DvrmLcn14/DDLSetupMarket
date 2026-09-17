@@ -72,11 +72,19 @@ export const StarRating: React.FC<StarRatingProps> = ({
 
       {showValue && (
         <span className="text-xs font-semibold text-amber-400 tracking-tight ml-0.5">
-          {rating.toFixed(1)}/5 stars
-          {totalRatings !== undefined && (
-            <span className="text-slate-400 font-normal ml-1">
-              ({totalRatings.toLocaleString()})
+          {totalRatings === 0 || rating === 0 ? (
+            <span className="text-slate-400 font-normal">
+              No ratings yet
             </span>
+          ) : (
+            <>
+              {rating.toFixed(1)}/5 stars
+              {totalRatings !== undefined && (
+                <span className="text-slate-400 font-normal ml-1">
+                  ({totalRatings.toLocaleString()})
+                </span>
+              )}
+            </>
           )}
         </span>
       )}

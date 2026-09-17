@@ -494,9 +494,9 @@ export const SubmitSetupModal: React.FC<SubmitSetupModalProps> = ({
 
     const targetId = setupToEdit ? setupToEdit.id : `setup-user-${Date.now()}`;
     const targetDateAdded = setupToEdit ? setupToEdit.dateAdded : new Date().toISOString().split('T')[0];
-    const targetDownloads = setupToEdit ? setupToEdit.downloads : 1;
-    const targetAvgRating = setupToEdit ? setupToEdit.averageRating : 5.0;
-    const targetRatingCount = setupToEdit ? setupToEdit.ratingCount : 1;
+    const targetDownloads = setupToEdit ? setupToEdit.downloads : 0;
+    const targetAvgRating = setupToEdit ? setupToEdit.averageRating : 0;
+    const targetRatingCount = setupToEdit ? setupToEdit.ratingCount : 0;
     const targetUserRating = setupToEdit ? setupToEdit.userRating : undefined;
     const targetCreatorBadge = setupToEdit?.creatorBadge || currentUser?.badge || 'Community';
     const targetCreatorAvatar = setupToEdit?.creatorAvatar;

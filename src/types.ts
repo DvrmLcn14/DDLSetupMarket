@@ -151,3 +151,17 @@ export interface SetupComment {
   isPinned?: boolean;
   replies?: SetupComment[];
 }
+
+export interface FloatingBannerConfig {
+  enabled: boolean;
+  title: string;
+  highlightText?: string;
+  description: string;
+  buttonText: string;
+  buttonUrl: string;
+  badgeText?: string;
+  onlineCount?: number;
+  iconType: 'discord' | 'custom' | 'sparkles' | 'trophy';
+  customIconUrl?: string;
+  accentColor?: 'indigo' | 'red' | 'emerald' | 'cyan' | 'amber';
+}

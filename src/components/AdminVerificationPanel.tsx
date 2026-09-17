@@ -37,6 +37,7 @@ interface AdminVerificationPanelProps {
   ) => void;
   onDeleteSetup?: (setupId: string) => void;
   onUpdateSetup?: (updatedSetup: CarSetup) => void;
+  onOpenBannerConfig?: () => void;
 }
 
 export const AdminVerificationPanel: React.FC<AdminVerificationPanelProps> = ({
@@ -46,6 +47,7 @@ export const AdminVerificationPanel: React.FC<AdminVerificationPanelProps> = ({
   onUpdateStatus,
   onDeleteSetup,
   onUpdateSetup,
+  onOpenBannerConfig,
 }) => {
   const [filterStatus, setFilterStatus] = useState<
     'pending' | 'verified' | 'rejected' | 'all'
@@ -200,7 +202,18 @@ export const AdminVerificationPanel: React.FC<AdminVerificationPanelProps> = ({
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            {onOpenBannerConfig && (
+              <button
+                type="button"
+                id="admin-edit-floating-banner-btn"
+                onClick={onOpenBannerConfig}
+                className="px-3 py-1.5 rounded-xl bg-[#5865F2]/20 hover:bg-[#5865F2]/30 text-indigo-300 border border-[#5865F2]/40 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
+              >
+                <span>💬</span>
+                <span>Edit Discord Ad Box</span>
+              </button>
+            )}
             <button
               type="button"
               onClick={onClose}

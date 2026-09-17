@@ -58,12 +58,13 @@ export const CreatorProfileModal: React.FC<CreatorProfileModalProps> = ({
 
   // Compute creator statistics
   const totalDownloads = creatorSetups.reduce((acc, s) => acc + (s.downloads || 0), 0);
+  const ratedSetups = creatorSetups.filter((s) => s.ratingCount > 0);
   const avgRating =
-    creatorSetups.length > 0
+    ratedSetups.length > 0
       ? (
-          creatorSetups.reduce((acc, s) => acc + (s.averageRating || 0), 0) / creatorSetups.length
+          ratedSetups.reduce((acc, s) => acc + (s.averageRating || 0), 0) / ratedSetups.length
         ).toFixed(1)
-      : '5.0';
+      : '0.0';
 
   // Input device preference
   const inputDeviceCounts = creatorSetups.reduce((acc, s) => {
@@ -168,7 +169,9 @@ export const CreatorProfileModal: React.FC<CreatorProfileModalProps> = ({
                   <span className="text-slate-400">downloads</span>
                 </div>
                 <div>
-                  <strong className="text-amber-400 font-black text-sm">{avgRating} ★</strong>{' '}
+                  <strong className="text-amber-400 font-black text-sm">
+                    {ratedSetups.length > 0 ? `${avgRating} ★` : 'No ratings'}
+                  </strong>{' '}
                   <span className="text-slate-400">avg rating</span>
                 </div>
               </div>
@@ -468,10 +471,18 @@ export const CreatorProfileModal: React.FC<CreatorProfileModalProps> = ({
                     <div className="flex items-center justify-between gap-2 pt-1 border-t border-slate-900">
                       <div className="flex items-center gap-1 text-[11px] text-amber-400 font-bold">
                         <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-                        <span>{setup.averageRating.toFixed(1)}</span>
-                        <span className="text-slate-500 font-normal text-[10px]">
-                          ({setup.ratingCount})
-                        </span>
+                        {setup.ratingCount > 0 ? (
+                          <>
+                            <span>{setup.averageRating.toFixed(1)}</span>
+                            <span className="text-slate-500 font-normal text-[10px]">
+                              ({setup.ratingCount})
+                            </span>
+                          </>
+                        ) : (
+                          <span className="text-slate-400 font-normal text-[10px]">
+                            No ratings yet
+                          </span>
+                        )}
                       </div>
 
                       <div className="flex items-center gap-1.5">
